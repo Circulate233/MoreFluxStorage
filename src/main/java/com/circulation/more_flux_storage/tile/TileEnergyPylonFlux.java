@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.api.network.ConnectionType;
@@ -55,7 +56,7 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
     public void update() {
         if (tick++ % 20 == 0) {
             var c = getFluxCore();
-            if (c == null || c.isInvalid()) selectNextCore();
+            if (c == null) selectNextCore();
         }
         data.update();
         super.update();
@@ -69,6 +70,7 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
             throw new IllegalStateException("Failed to access TileEnergyPylon#getCore", e);
         }
         if (core == null || core.isInvalid()) return null;
+        if (!core.active.value) return null;
         return core;
     }
 
@@ -86,12 +88,12 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
         return received;
     }
 
-    private long extractLongEnergy(TileEnergyStorageCore core, long maxExtract, boolean simulate) {
+    private long extractLongEnergy(TileEnergyStorageCore core, long maxExtract) {
         if (core == null || core.getWorld() == null || core.getWorld().isRemote || maxExtract <= 0L) {
             return 0L;
         }
         long extracted = Math.min(core.getExtendedStorage(), maxExtract);
-        if (!simulate && extracted > 0L) {
+        if (extracted > 0L) {
             core.energy.value -= extracted;
             core.markDirty();
         }
@@ -99,7 +101,7 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
     }
 
     @Override
-    public net.minecraft.tileentity.TileEntity getFluxGuiTileEntity() {
+    public TileEntity getFluxGuiTileEntity() {
         return this;
     }
 
@@ -120,7 +122,7 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
     }
 
     @Override
-    public FluxGuiConnectorData getData() {
+    public FluxGuiConnectorData getFluxData() {
         return data;
     }
 
@@ -184,7 +186,7 @@ public final class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxG
             if (core == null || l <= 0L) {
                 return 0L;
             }
-            long extracted = extractLongEnergy(core, l, false);
+            long extracted = extractLongEnergy(core, l);
             markRemoved(extracted);
             return extracted;
         }

@@ -16,179 +16,179 @@ import java.util.UUID;
 
 public interface IFluxGuiConnector extends IFluxStorage {
 
-    FluxGuiConnectorData getData();
+    FluxGuiConnectorData getFluxData();
 
     default long getMaxTransferLimit() {
-        return getData().getMaxTransferLimit();
+        return getFluxData().getMaxTransferLimit();
     }
 
     @Override
     default int getNetworkID() {
-        return getData().getNetworkID();
+        return getFluxData().getNetworkID();
     }
 
     @Override
     default IFluxNetwork getNetwork() {
-        return getData().getNetwork();
+        return getFluxData().getNetwork();
     }
 
     @Override
     default void open(EntityPlayer player) {
-        getData().open(player);
+        getFluxData().open(player);
     }
 
     @Override
     default void close(EntityPlayer player) {
-        getData().close(player);
+        getFluxData().close(player);
     }
 
     @Override
     default NBTTagCompound writeCustomNBT(NBTTagCompound tag, NBTType type) {
-        getData().writeCustomNBT(tag, type);
+        getFluxData().writeCustomNBT(tag, type);
         return tag;
     }
 
     @Override
     default void readCustomNBT(NBTTagCompound tag, NBTType type) {
-        getData().readCustomNBT(tag, type);
+        getFluxData().readCustomNBT(tag, type);
     }
 
     @Override
     default int getLogicPriority() {
-        return getData().getLogicPriority();
+        return getFluxData().getLogicPriority();
     }
 
     @Override
     default int getRawPriority() {
-        return getData().getRawPriority();
+        return getFluxData().getRawPriority();
     }
 
     default void setRawPriority(int priority) {
-        getData().setRawPriority(priority);
-        getData().sync();
+        getFluxData().setRawPriority(priority);
+        getFluxData().sync();
     }
 
     @Override
     default UUID getConnectionOwner() {
-        return getData().getConnectionOwner();
+        return getFluxData().getConnectionOwner();
     }
 
     @Override
     default ConnectionType getConnectionType() {
-        return getData().getConnectionType();
+        return getFluxData().getConnectionType();
     }
 
     @Override
     default boolean canAccess(EntityPlayer player) {
-        return getData().canAccess(player);
+        return getFluxData().canAccess(player);
     }
 
     @Override
     default long getLogicLimit() {
-        return getData().getLogicLimit();
+        return getFluxData().getLogicLimit();
     }
 
     @Override
     default long getRawLimit() {
-        return getData().getRawLimit();
+        return getFluxData().getRawLimit();
     }
 
     default void setRawLimit(long limit) {
-        getData().setRawLimit(sanitizeFluxGuiLimit(limit));
-        getData().sync();
+        getFluxData().setRawLimit(sanitizeFluxGuiLimit(limit));
+        getFluxData().sync();
     }
 
     @Override
     default boolean isActive() {
-        return getData().isActive();
+        return getFluxData().isActive();
     }
 
     @Override
     default boolean isChunkLoaded() {
-        return getData().isChunkLoaded();
+        return getFluxData().isChunkLoaded();
     }
 
     @Override
     default boolean isForcedLoading() {
-        return getData().isForcedLoading();
+        return getFluxData().isForcedLoading();
     }
 
     default void connect(IFluxNetwork network) {
-        getData().connect(network);
+        getFluxData().connect(network);
     }
 
     default void disconnect(IFluxNetwork network) {
-        getData().disconnect(network);
+        getFluxData().disconnect(network);
     }
 
     @Override
     default World getFluxWorld() {
-        return getData().getFluxWorld();
+        return getFluxData().getFluxWorld();
     }
 
     @Override
     default Coord4D getCoords() {
-        return getData().getCoords();
+        return getFluxData().getCoords();
     }
 
     @Override
     default int getFolderID() {
-        return getData().getFolderID();
+        return getFluxData().getFolderID();
     }
 
     @Override
     default String getCustomName() {
-        return getData().getCustomName();
+        return getFluxData().getCustomName();
     }
 
     default void setCustomName(String customName) {
-        getData().setCustomName(customName);
-        getData().sync();
+        getFluxData().setCustomName(customName);
+        getFluxData().sync();
     }
 
     @Override
     default boolean getDisableLimit() {
-        return getData().getDisableLimit();
+        return getFluxData().getDisableLimit();
     }
 
     default void setDisableLimit(boolean disabled) {
-        getData().setDisableLimit(disabled);
-        getData().sync();
+        getFluxData().setDisableLimit(disabled);
+        getFluxData().sync();
     }
 
     @Override
     default boolean getSurgeMode() {
-        return getData().getSurgeMode();
+        return getFluxData().getSurgeMode();
     }
 
     default void setSurgeMode(boolean surgeMode) {
-        getData().setSurgeMode(surgeMode);
-        getData().sync();
+        getFluxData().setSurgeMode(surgeMode);
+        getFluxData().sync();
     }
 
     default void setChunkLoading(boolean chunkLoading) {
-        getData().setChunkLoading(chunkLoading);
-        getData().sync();
+        getFluxData().setChunkLoading(chunkLoading);
+        getFluxData().sync();
     }
 
     default void setPlayerUUID(UUID uuid) {
-        getData().setPlayerUUID(uuid);
-        getData().sync();
+        getFluxData().setPlayerUUID(uuid);
+        getFluxData().sync();
     }
 
     @Override
     default long getTransferBuffer() {
-        return getData().getTransferBuffer();
+        return getFluxData().getTransferBuffer();
     }
 
     @Override
     default long getTransferChange() {
-        return getData().getTransferChange();
+        return getFluxData().getTransferChange();
     }
 
     @Override
     default ItemStack getDisplayStack() {
-        return getData().getDisplayStack();
+        return getFluxData().getDisplayStack();
     }
 
     default BlockPos getFluxGuiPos() {

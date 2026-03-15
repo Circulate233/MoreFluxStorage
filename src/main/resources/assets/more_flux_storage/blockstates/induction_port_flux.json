@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "normal": {
+      "model": "more_flux_storage:induction_port_flux"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 package com.circulation.more_flux_storage.registry;
 
 import com.circulation.more_flux_storage.block.BlockEnergyPylonFlux;
+import com.circulation.more_flux_storage.block.BlockInductionPortFlux;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -23,12 +24,19 @@ public final class RegistryBlocks {
     private static final List<Block> BLOCK_MODELS_TO_REGISTER = new LinkedList<>();
 
     public static final BlockEnergyPylonFlux ENERGY_PYLON_FLUX;
+    public static final BlockInductionPortFlux INDUCTION_PORT_FLUX;
 
     static {
         if (Loader.isModLoaded("draconicevolution")) {
             prepareItemBlockRegister(ENERGY_PYLON_FLUX = registerBlock(new BlockEnergyPylonFlux()));
         } else {
             ENERGY_PYLON_FLUX = null;
+        }
+
+        if (Loader.isModLoaded("mekanism")) {
+            prepareItemBlockRegister(INDUCTION_PORT_FLUX = registerBlock(new BlockInductionPortFlux()));
+        } else {
+            INDUCTION_PORT_FLUX = null;
         }
     }
 

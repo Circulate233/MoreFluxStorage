@@ -38,7 +38,9 @@ public class FluxGuiConnectorData {
     public Set<EntityPlayer> playerUsing = new ObjectOpenHashSet<>();
     @Getter
     private IFluxNetwork network = FluxNetworkInvalid.instance;
-    private int networkId = -1;
+    @Getter
+    @Setter
+    private int networkID = -1;
     private UUID owner = new UUID(0L, 0L);
     @Getter
     @Setter
@@ -68,10 +70,6 @@ public class FluxGuiConnectorData {
         this.owner = uuid;
     }
 
-    public int getNetworkID() {
-        return networkId;
-    }
-
     public void writeCustomNBT(NBTTagCompound tag, NBTType type) {
         tag.setInteger(TAG_NETWORK_ID, getNetworkID());
         tag.setUniqueId(TAG_OWNER, owner);
@@ -86,7 +84,7 @@ public class FluxGuiConnectorData {
     }
 
     public void readCustomNBT(NBTTagCompound tag, NBTType type) {
-        networkId = tag.getInteger(TAG_NETWORK_ID);
+        networkID = tag.getInteger(TAG_NETWORK_ID);
         customName = tag.getString(TAG_CUSTOM_NAME);
         priority = tag.getInteger(TAG_PRIORITY);
         limit = tag.getLong(TAG_LIMIT);
@@ -108,14 +106,13 @@ public class FluxGuiConnectorData {
 
             if (!this.load) {
                 if (!FluxUtils.addConnection((IFluxGuiConnector) this.host)) {
-                    this.networkId = -1;
+                    this.networkID = -1;
                 }
 
                 this.sendPackets();
                 this.load = true;
             }
         }
-
     }
 
     public void onChunkUnload() {
@@ -138,7 +135,7 @@ public class FluxGuiConnectorData {
     }
 
     public int getLogicPriority() {
-        return priority;
+        return this.surgeMode ? -10000 : Math.min(this.priority - 1000000, -10000);
     }
 
     public int getRawPriority() {
@@ -191,7 +188,7 @@ public class FluxGuiConnectorData {
 
     public void connect(@Nonnull IFluxNetwork network) {
         this.network = network;
-        this.networkId = network.getNetworkID();
+        this.networkID = network.getNetworkID();
     }
 
     public void open(EntityPlayer player) {
@@ -216,7 +213,7 @@ public class FluxGuiConnectorData {
     public void disconnect(IFluxNetwork network) {
         if (network != null && network.getNetworkID() == getNetworkID()) {
             this.network = FluxNetworkInvalid.instance;
-            this.networkId = -1;
+            this.networkID = -1;
         }
     }
 

@@ -1,5 +1,7 @@
 package com.circulation.more_flux_storage.util;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import sonar.fluxnetworks.api.network.ITransferHandler;
@@ -12,7 +14,11 @@ public abstract class AbstractFluxTransferHandler implements ITransferHandler {
 
     private long added;
     private long removed;
+    @Getter
+    @Setter
     private long buffer;
+    @Getter
+    @Setter
     private long change;
 
     protected final void markAdded(long amount) {
@@ -35,14 +41,6 @@ public abstract class AbstractFluxTransferHandler implements ITransferHandler {
         return buffer;
     }
 
-    protected final void setCachedBuffer(long buffer) {
-        this.buffer = buffer;
-    }
-
-    protected final void setCachedChange(long change) {
-        this.change = change;
-    }
-
     protected final boolean shouldSyncTransferNbt(NBTType type) {
         return switch (type) {
             case DEFAULT, TILE_SAVE, TILE_DROP, TILE_UPDATE, ALL_SAVE -> true;
@@ -59,16 +57,6 @@ public abstract class AbstractFluxTransferHandler implements ITransferHandler {
         change = added - removed;
         added = 0L;
         removed = 0L;
-    }
-
-    @Override
-    public long getBuffer() {
-        return buffer;
-    }
-
-    @Override
-    public long getChange() {
-        return change;
     }
 
     @Override
