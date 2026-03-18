@@ -1,0 +1,13 @@
+dependencies {
+    runtimeOnly("com.cleanroommc:strip-latest-forge-requirements:1.0")
+    runtimeOnly("com.cleanroommc:osxnarratorblocker:1.0")
+
+    compileOnly(rfg.deobf("curse.maven:industrialcraft-2-242638:3078604"))
+    runtimeOnly(rfg.deobf("curse.maven:had-enough-items-557549:7340288"))
+    implementation(rfg.deobf("curse.maven:flux-networks-248020:3178199"))
+    implementation(rfg.deobf("curse.maven:brandons-core-231382:3408276"))
+    implementation(rfg.deobf("curse.maven:draconic-evolution-223565:3431261"))
+    implementation(rfg.deobf("curse.maven:CodeChickenLib-242818:2779848"))
+    implementation(rfg.deobf("curse.maven:RedstoneFlux-270789:2920436"))
+    implementation(rfg.deobf("curse.maven:mekanism-ce-unofficial-840735:7680340"))
+}

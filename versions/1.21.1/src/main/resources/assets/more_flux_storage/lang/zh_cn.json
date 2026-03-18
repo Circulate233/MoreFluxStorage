@@ -1,0 +1,5 @@
+{
+  "itemGroup.more_flux_storage": "更多通量存储",
+  "block.more_flux_storage.energy_pylon_flux": "通量能源端口",
+  "block.more_flux_storage.induction_port_flux": "通量感应端口"
+}

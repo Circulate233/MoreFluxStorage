@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "more_flux_storage:block/induction_port_flux"
+    },
+    "active=true": {
+      "model": "more_flux_storage:block/induction_port_flux_output"
+    }
+  }
+}

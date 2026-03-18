@@ -1,0 +1,48 @@
+(configurations.named('ksp') ?: configurations.create('ksp'))
+apply plugin: 'net.neoforged.moddev'
+apply plugin: 'dev.kikugie.fletching-table.neoforge'
+
+neoForge {
+	version = neoforge_version
+	validateAccessTransformers = true
+
+	runs {
+		if (use_mixins.toString().toBoolean()) {
+			def mixinConfigs = mixin_configs.toString().split(' ').findAll { !it.isEmpty() }.collect { "mixins.${it}.json" }
+			configureEach {
+				mixinConfigs.each { config ->
+					programArgument '--mixin.config'
+					programArgument config
+				}
+			}
+		}
+
+		client {
+			client()
+		}
+		server {
+			server()
+		}
+		data {
+			data()
+		}
+	}
+
+	mods {
+		register(mod_id.toString()) {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+def prepareEmptyKspDir = tasks.register('prepareEmptyKspDir') {
+	def outputDir = layout.buildDirectory.dir('generated/ksp')
+	outputs.dir(outputDir)
+	doLast {
+		outputDir.get().asFile.mkdirs()
+	}
+}
+
+tasks.named('processResources') {
+	dependsOn(prepareEmptyKspDir)
+}

@@ -1,0 +1,72 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "more_flux_storage:induction_port_flux",
+          "functions": [
+            {
+              "function": "minecraft:copy_nbt",
+              "source": "block_entity",
+              "ops": [
+                {
+                  "source": "networkID",
+                  "target": "tag.FluxData.networkID",
+                  "op": "replace"
+                },
+                {
+                  "source": "playerUUID",
+                  "target": "tag.FluxData.playerUUID",
+                  "op": "replace"
+                },
+                {
+                  "source": "customName",
+                  "target": "tag.FluxData.customName",
+                  "op": "replace"
+                },
+                {
+                  "source": "forcedLoading",
+                  "target": "tag.FluxData.forcedLoading",
+                  "op": "replace"
+                },
+                {
+                  "source": "chunkLoaded",
+                  "target": "tag.FluxData.chunkLoaded",
+                  "op": "replace"
+                },
+                {
+                  "source": "priority",
+                  "target": "tag.FluxData.priority",
+                  "op": "replace"
+                },
+                {
+                  "source": "surgeMode",
+                  "target": "tag.FluxData.surgeMode",
+                  "op": "replace"
+                },
+                {
+                  "source": "limit",
+                  "target": "tag.FluxData.limit",
+                  "op": "replace"
+                },
+                {
+                  "source": "disableLimit",
+                  "target": "tag.FluxData.disableLimit",
+                  "op": "replace"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
+    }
+  ]
+}

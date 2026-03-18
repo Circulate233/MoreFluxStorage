@@ -1,0 +1,43 @@
+pluginManagement {
+    repositories {
+        maven("https://nexus.gtnewhorizons.com/repository/public/") {
+            name = "GTNH Maven"
+            content {
+                includeGroup("com.gtnewhorizons")
+                includeGroup("com.gtnewhorizons.retrofuturagradle")
+            }
+        }
+        maven("https://maven.kikugie.dev/releases") {
+            name = "KikuGie Releases"
+        }
+        maven("https://maven.kikugie.dev/snapshots") {
+            name = "KikuGie Snapshots"
+        }
+        maven("https://maven.minecraftforge.net/") {
+            name = "MinecraftForge Plugins"
+        }
+        maven("https://maven.neoforged.net/releases") {
+            name = "NeoForged Plugins"
+        }
+        gradlePluginPortal()
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("dev.kikugie.stonecutter") version "0.8.3"
+}
+
+rootProject.name = rootDir.name
+
+stonecutter {
+    kotlinController = true
+    centralScript = "build.gradle.kts"
+
+    create(getRootProject()) {
+        versions("1.12.2", "1.20.1", "1.21.1")
+        vcsVersion = "1.12.2"
+    }
+}

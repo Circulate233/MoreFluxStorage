@@ -1,0 +1,14 @@
+(configurations.named('ksp') ?: configurations.create('ksp'))
+apply plugin: 'dev.kikugie.fletching-table'
+
+def prepareEmptyKspDir = tasks.register('prepareEmptyKspDir') {
+	def outputDir = layout.buildDirectory.dir('generated/ksp')
+	outputs.dir(outputDir)
+	doLast {
+		outputDir.get().asFile.mkdirs()
+	}
+}
+
+tasks.named('processResources') {
+	dependsOn(prepareEmptyKspDir)
+}
