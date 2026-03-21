@@ -7,16 +7,6 @@ neoForge {
 	validateAccessTransformers = true
 
 	runs {
-		if (use_mixins.toString().toBoolean()) {
-			def mixinConfigs = mixin_configs.toString().split(' ').findAll { !it.isEmpty() }.collect { "mixins.${it}.json" }
-			configureEach {
-				mixinConfigs.each { config ->
-					programArgument '--mixin.config'
-					programArgument config
-				}
-			}
-		}
-
 		client {
 			client()
 		}

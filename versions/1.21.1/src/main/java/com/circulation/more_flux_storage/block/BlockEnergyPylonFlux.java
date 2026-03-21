@@ -1,14 +1,11 @@
 package com.circulation.more_flux_storage.block;
 
 import com.brandon3055.draconicevolution.blocks.StructureBlock;
-import com.brandon3055.draconicevolution.blocks.machines.EnergyPylon;
-import com.brandon3055.draconicevolution.blocks.machines.EnergyPylon.Mode;
 import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import com.circulation.more_flux_storage.blockentity.TileEnergyPylonFlux;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,17 +31,11 @@ public class BlockEnergyPylonFlux extends AbstractFluxGuiBlock {
 
     private BlockEnergyPylonFlux(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(EnergyPylon.MODE, Mode.OUTPUT).setValue(EnergyPylon.FACING, Direction.UP));
     }
 
     @Override
     protected @NotNull MapCodec<? extends AbstractFluxGuiBlock> codec() {
         return CODEC;
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(EnergyPylon.MODE, EnergyPylon.FACING);
     }
 
     @Override

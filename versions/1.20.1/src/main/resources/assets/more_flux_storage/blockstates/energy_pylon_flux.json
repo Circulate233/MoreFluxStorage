@@ -1,56 +1,7 @@
 {
   "variants": {
-    "mode=input,facing=down": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input",
-      "x": 180
-    },
-    "mode=input,facing=up": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input"
-    },
-    "mode=input,facing=north": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input",
-      "x": 90
-    },
-    "mode=input,facing=south": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input",
-      "x": 90,
-      "y": 180
-    },
-    "mode=input,facing=west": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input",
-      "x": 90,
-      "y": 270
-    },
-    "mode=input,facing=east": {
-      "model": "more_flux_storage:block/energy_pylon_flux_input",
-      "x": 90,
-      "y": 90
-    },
-    "mode=output,facing=down": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output",
-      "x": 180
-    },
-    "mode=output,facing=up": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output"
-    },
-    "mode=output,facing=north": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output",
-      "x": 90
-    },
-    "mode=output,facing=south": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output",
-      "x": 90,
-      "y": 180
-    },
-    "mode=output,facing=west": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output",
-      "x": 90,
-      "y": 270
-    },
-    "mode=output,facing=east": {
-      "model": "more_flux_storage:block/energy_pylon_flux_output",
-      "x": 90,
-      "y": 90
+    "": {
+      "model": "more_flux_storage:block/energy_pylon_flux"
     }
   }
 }

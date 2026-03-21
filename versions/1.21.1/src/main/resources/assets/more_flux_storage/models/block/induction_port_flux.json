@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "more_flux_storage:block/induction_port_flux"
+    "all": "more_flux_storage:blocks/induction_port_flux"
   }
 }

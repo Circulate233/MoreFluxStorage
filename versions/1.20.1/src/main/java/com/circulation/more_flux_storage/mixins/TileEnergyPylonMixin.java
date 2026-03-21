@@ -1,8 +1,8 @@
 package com.circulation.more_flux_storage.mixins;
 
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyPylon;
-import com.circulation.more_flux_storage.blockentity.TileEnergyPylonFlux;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
+import com.circulation.more_flux_storage.util.Utils;
 import net.minecraftforge.registries.RegistryObject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,8 +18,8 @@ public abstract class TileEnergyPylonMixin {
             target = "Lnet/minecraftforge/registries/RegistryObject;get()Ljava/lang/Object;"
         )
     )
-    private Object redirectBlockEntityType(RegistryObject<?> instance) {
-        if ((Object) this instanceof TileEnergyPylonFlux) {
+    private static Object redirectBlockEntityType(RegistryObject<?> instance) {
+        if (Utils.trigger()) {
             return MoreFluxStorageContent.ENERGY_PYLON_FLUX_BLOCK_ENTITY.get();
         }
         return instance.get();

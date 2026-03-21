@@ -1,5 +1,6 @@
 package com.circulation.more_flux_storage.util;
 
+import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
@@ -7,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import sonar.fluxnetworks.api.FluxConstants;
+import sonar.fluxnetworks.common.connection.FluxNetwork;
 
 import java.util.UUID;
 
@@ -172,5 +174,7 @@ public class FluxGuiConnectorData {
         int getFluxGuiFolderId();
 
         void onFluxGuiDataChanged();
+
+        IFluxGuiConnector getFluxConnector();
     }
 }

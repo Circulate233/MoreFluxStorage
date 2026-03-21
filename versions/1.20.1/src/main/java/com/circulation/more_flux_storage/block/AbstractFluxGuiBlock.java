@@ -59,6 +59,7 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
         }
         if (player instanceof ServerPlayer serverPlayer) {
             NetworkHooks.openScreen(serverPlayer, connector, buf -> {
+                buf.writeBoolean(true);
                 buf.writeBlockPos(pos);
                 CompoundTag tag = new CompoundTag();
                 connector.writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);

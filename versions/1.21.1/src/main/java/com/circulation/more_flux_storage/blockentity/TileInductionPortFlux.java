@@ -4,6 +4,7 @@ import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
 import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.Utils;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.common.content.matrix.MatrixEnergyContainer;
@@ -28,7 +29,7 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
     private final IFluxGuiConnector fluxConnector = new FluxConnector();
 
     public TileInductionPortFlux(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(Utils.trigger(pos), state);
     }
 
     @Override

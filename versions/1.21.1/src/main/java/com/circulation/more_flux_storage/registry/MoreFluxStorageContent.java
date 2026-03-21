@@ -10,12 +10,10 @@ import com.circulation.more_flux_storage.blockentity.TileInductionPortFlux;
 import com.circulation.more_flux_storage.menu.FluxGuiConnectorMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -46,8 +44,7 @@ public final class MoreFluxStorageContent {
         "induction_port_flux",
         () -> BlockEntityType.Builder.of(TileInductionPortFlux::new, INDUCTION_PORT_FLUX.get()).build(null)
     );
-
-    public static final DeferredHolder<MenuType<?>, MenuType<FluxGuiConnectorMenu>> FLUX_GUI_CONNECTOR_MENU = MENU_TYPES.register(
+    public static final DeferredHolder<MenuType<?>, MenuType<AbstractContainerMenu>> FLUX_GUI_CONNECTOR_MENU = MENU_TYPES.register(
         "flux_gui_connector",
         () -> IMenuTypeExtension.create((windowId, inv, data) -> {
             var pos = data.readBlockPos();

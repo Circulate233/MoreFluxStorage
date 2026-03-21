@@ -1,6 +1,5 @@
 package com.circulation.more_flux_storage.api;
 
-import com.circulation.more_flux_storage.menu.FluxGuiConnectorMenu;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
 import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
 import net.minecraft.core.BlockPos;
@@ -11,12 +10,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.api.device.FluxDeviceType;
 import sonar.fluxnetworks.api.device.IFluxStorage;
+import sonar.fluxnetworks.common.connection.FluxMenu;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public interface IFluxGuiConnector extends IFluxStorage, FluxGuiConnectorLogic {
 
     FluxGuiConnectorData getFluxData();
@@ -31,9 +34,13 @@ public interface IFluxGuiConnector extends IFluxStorage, FluxGuiConnectorLogic {
         return FluxDeviceType.STORAGE;
     }
 
+    Level getLevel();
+
+    BlockState getBlockState();
+
     @Override
-    default AbstractContainerMenu createMenu(int containerId, @NotNull Inventory inventory, @NotNull Player player) {
-        return new FluxGuiConnectorMenu(containerId, inventory, this);
+    default AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        return new FluxMenu(containerId, inventory, this);
     }
 
     @Override
@@ -52,21 +59,21 @@ public interface IFluxGuiConnector extends IFluxStorage, FluxGuiConnectorLogic {
         return getFluxData().getConnectionOwner();
     }
 
-    default void onPlayerOpened(@NotNull Player player) {
+    default void onPlayerOpened(Player player) {
         getFluxData().open(player);
     }
 
-    default void onPlayerClosed(@NotNull Player player) {
+    default void onPlayerClosed(Player player) {
         getFluxData().close(player);
     }
 
     @Override
-    default void writeCustomTag(@NotNull CompoundTag tag, byte type) {
+    default void writeCustomTag(CompoundTag tag, byte type) {
         getFluxData().writeCustomTag(tag, type);
     }
 
     @Override
-    default void readCustomTag(@NotNull CompoundTag tag, byte type) {
+    default void readCustomTag(CompoundTag tag, byte type) {
         getFluxData().readCustomTag(tag, type);
     }
 

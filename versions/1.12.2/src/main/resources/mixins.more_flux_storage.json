@@ -1,16 +1,18 @@
 {
-  "package": "com.circulation.more_flux_storage.mixins",
-  "required": true,
-  "refmap": "mixins.more_flux_storage.refmap.json",
-  "target": "@env(DEFAULT)",
-  "minVersion": "0.8.5",
-  "compatibilityLevel": "JAVA_8",
-  "mixins": [
-    "flux.MixinFluxNetworkServer",
-    "flux.MixinPacketTile"
-  ],
-  "server": [],
-  "client": [
-    "flux.MixinGuiTabCore"
-  ]
+    "package": "com.circulation.more_flux_storage.mixins",
+    "required": true,
+    "refmap": "mixins.more_flux_storage.refmap.json",
+    "target": "@env(DEFAULT)",
+    "minVersion": "0.8.5",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [
+        "flux.MixinFluxNetworkServer",
+        "flux.MixinPacketTile"
+    ],
+    "server": [
+        
+    ],
+    "client": [
+        "flux.MixinGuiTabCore"
+    ]
 }

@@ -6,6 +6,7 @@ import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
 import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +25,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
     private int fluxTick;
 
     public TileEnergyPylonFlux(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(Utils.trigger(pos), state);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, TileEnergyPylonFlux tile) {

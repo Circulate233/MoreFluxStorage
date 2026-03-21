@@ -1,51 +1,23 @@
 package com.circulation.more_flux_storage.menu;
 
 import com.circulation.more_flux_storage.api.IFluxGuiConnector;
-import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
+import sonar.fluxnetworks.common.connection.FluxMenu;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class FluxGuiConnectorMenu extends AbstractContainerMenu {
+public class FluxGuiConnectorMenu extends FluxMenu {
 
-    @Nullable
-    private final IFluxGuiConnector provider;
-
-    public FluxGuiConnectorMenu(int containerId, Inventory inventory, @Nullable IFluxGuiConnector provider) {
-        super(MoreFluxStorageContent.FLUX_GUI_CONNECTOR_MENU.get(), containerId);
-        this.provider = provider;
-        if (provider != null) {
-            provider.onPlayerOpened(inventory.player);
-        }
-    }
-
-    @Nullable
-    public IFluxGuiConnector getProvider() {
-        return provider;
-    }
-
-    @Override
-    public @NotNull ItemStack quickMoveStack(@NotNull Player player, int index) {
-        return ItemStack.EMPTY;
+    public FluxGuiConnectorMenu(int containerId, Inventory inventory, IFluxGuiConnector provider) {
+        super(containerId, inventory, provider);
     }
 
     @Override
     public boolean stillValid(@NotNull Player player) {
-        if (provider == null) return false;
-        var pos = provider.getFluxGuiPos();
-        var level = provider.getFluxGuiLevel();
-        if (level == null || pos == null) return false;
-        return player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0;
-    }
-
-    @Override
-    public void removed(@NotNull Player player) {
-        super.removed(player);
-        if (provider != null) {
-            provider.onPlayerClosed(player);
+        if (mProvider instanceof IFluxGuiConnector connector) {
+            var level = connector.getFluxGuiLevel();
+            return connector.isChunkLoaded() && level == player.level();
         }
+        return super.stillValid(player);
     }
 }

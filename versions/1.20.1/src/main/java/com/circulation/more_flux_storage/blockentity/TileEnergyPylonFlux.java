@@ -1,11 +1,12 @@
 package com.circulation.more_flux_storage.blockentity;
 
-import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyCore;
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyPylon;
+import com.circulation.more_flux_storage.api.IFluxGuiConnector;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
 import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.api.FluxConstants;
+import sonar.fluxnetworks.common.connection.FluxNetworkData;
 
 public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConnectorData.Host {
 
@@ -21,9 +23,10 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
     private final EnergyPylonTransferHandler transferHandler = new EnergyPylonTransferHandler();
     private final IFluxGuiConnector fluxConnector = new FluxConnector();
     private int fluxTick;
+    private boolean init;
 
     public TileEnergyPylonFlux(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(Utils.trigger(pos), state);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, TileEnergyPylonFlux tile) {
@@ -32,6 +35,9 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
 
     @Override
     public void tick() {
+        if (!init) {
+
+        }
         if (level != null && !level.isClientSide && fluxTick++ % 20 == 0 && getCore() == null) {
             selectNextCore();
         }
@@ -119,6 +125,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
     private final class EnergyPylonTransferHandler extends AbstractFluxTransferHandler {
 
         private void syncBufferFromCore() {
+            if (level == null) return;
             TileEnergyCore core = getCore();
             setBuffer(core == null ? 0L : core.energy.getOPStored());
         }
@@ -176,6 +183,16 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
         @Override
         public FluxGuiConnectorData getFluxData() {
             return data;
+        }
+
+        @Override
+        public Level getLevel() {
+            return TileEnergyPylonFlux.this.getLevel();
+        }
+
+        @Override
+        public BlockState getBlockState() {
+            return TileEnergyPylonFlux.this.getBlockState();
         }
 
         @Override

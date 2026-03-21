@@ -1,10 +1,10 @@
 package com.circulation.more_flux_storage.blockentity;
 
 import com.circulation.more_flux_storage.api.IFluxGuiConnector;
-import com.circulation.more_flux_storage.block.BlockInductionPortFlux;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
 import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.Utils;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.math.FloatingLong;
@@ -32,7 +32,7 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
     private final IFluxGuiConnector fluxConnector = new FluxConnector();
 
     public TileInductionPortFlux(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(Utils.trigger(pos), state);
     }
 
     private static long toFlux(FloatingLong amount) {
@@ -90,10 +90,6 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
         if (level == null) return InteractionResult.PASS;
         boolean newActive = !getActive();
         setActive(newActive);
-        BlockState state = getBlockState();
-        if (state.hasProperty(BlockInductionPortFlux.ACTIVE)) {
-            level.setBlockAndUpdate(worldPosition, state.setValue(BlockInductionPortFlux.ACTIVE, newActive));
-        }
         return InteractionResult.SUCCESS;
     }
 
@@ -222,6 +218,16 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
         @Override
         public FluxGuiConnectorData getFluxData() {
             return data;
+        }
+
+        @Override
+        public Level getLevel() {
+            return TileInductionPortFlux.this.getLevel();
+        }
+
+        @Override
+        public BlockState getBlockState() {
+            return TileInductionPortFlux.this.getBlockState();
         }
 
         @Override
