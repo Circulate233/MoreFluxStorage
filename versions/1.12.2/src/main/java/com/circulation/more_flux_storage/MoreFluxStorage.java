@@ -19,7 +19,10 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION)
+@Mod(modid = Tags.MOD_ID, name = Tags.MOD_NAME, version = Tags.VERSION,
+    dependencies = "required-after:mixinbooter@[8.0,);" +
+        "required-after:fluxnetworks"
+)
 public class MoreFluxStorage {
 
     public static final String MOD_ID = Tags.MOD_ID;

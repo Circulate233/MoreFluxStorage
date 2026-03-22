@@ -19,7 +19,7 @@ public abstract class TileEnergyPylonMixin {
         )
     )
     private static Object redirectBlockEntityType(RegistryObject<?> instance) {
-        if (Utils.trigger()) {
+        if (Utils.trigger() && MoreFluxStorageContent.ENERGY_PYLON_FLUX_BLOCK_ENTITY != null) {
             return MoreFluxStorageContent.ENERGY_PYLON_FLUX_BLOCK_ENTITY.get();
         }
         return instance.get();

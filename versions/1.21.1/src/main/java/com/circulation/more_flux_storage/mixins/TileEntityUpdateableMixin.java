@@ -19,7 +19,7 @@ public abstract class TileEntityUpdateableMixin {
         )
     )
     private static Object redirectBlockEntityType(TileEntityTypeRegistryObject<?> instance) {
-        if (Utils.trigger()) {
+        if (Utils.trigger() && MoreFluxStorageContent.INDUCTION_PORT_FLUX_BLOCK_ENTITY != null) {
             return MoreFluxStorageContent.INDUCTION_PORT_FLUX_BLOCK_ENTITY.get();
         }
         return instance.get();

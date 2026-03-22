@@ -1,5 +1,9 @@
 {
   "itemGroup.more_flux_storage": "更多通量存储",
   "block.more_flux_storage.energy_pylon_flux": "通量能源端口",
-  "block.more_flux_storage.induction_port_flux": "通量感应端口"
+  "block.more_flux_storage.induction_port_flux": "通量感应端口",
+  "block.more_flux_storage.flux_accessor_flux": "通量访问端口",
+  "block.more_flux_storage.energy_pylon_flux.tooltip": "真龙之相，万灵所钟",
+  "block.more_flux_storage.induction_port_flux.tooltip": "万化之能，归于一相",
+  "block.more_flux_storage.flux_accessor_flux.tooltip": "数态流转，灵枢恒驻"
 }

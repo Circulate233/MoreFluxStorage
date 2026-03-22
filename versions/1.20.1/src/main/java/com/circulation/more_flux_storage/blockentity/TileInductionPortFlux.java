@@ -1,9 +1,9 @@
 package com.circulation.more_flux_storage.blockentity;
 
-import com.circulation.more_flux_storage.api.IFluxGuiConnector;
+import com.circulation.more_flux_storage.api.IFluxProxyHost;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
-import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.ProxyFluxDevice;
 import com.circulation.more_flux_storage.util.Utils;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
@@ -14,22 +14,27 @@ import mekanism.common.tile.multiblock.TileEntityInductionPort;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.api.FluxConstants;
+import sonar.fluxnetworks.common.device.TileFluxDevice;
 
-public class TileInductionPortFlux extends TileEntityInductionPort implements FluxGuiConnectorData.Host {
+import java.util.Objects;
+import java.util.UUID;
+
+@SuppressWarnings("ReturnOfInnerClass")
+public class TileInductionPortFlux extends TileEntityInductionPort implements IFluxProxyHost, ProxyFluxDevice.Host {
 
     private static final double MEKANISM_TO_FLUX = 0.4D;
     private static final double FLUX_TO_MEKANISM = 1D / MEKANISM_TO_FLUX;
 
-    private final FluxGuiConnectorData data = new FluxGuiConnectorData(this);
     private final InductionPortTransferHandler transferHandler = new InductionPortTransferHandler();
-    private final IFluxGuiConnector fluxConnector = new FluxConnector();
+    private ProxyFluxDevice fluxProxyDevice;
 
     public TileInductionPortFlux(BlockPos pos, BlockState state) {
         super(Utils.trigger(pos), state);
@@ -50,107 +55,198 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
     }
 
     @Override
+    protected boolean onUpdateServer(MatrixMultiblockData multiblock) {
+        boolean needsSync = super.onUpdateServer(multiblock);
+        transferHandler.syncBufferFromMatrix();
+        getOrCreateFluxProxyDevice().hostServerTick();
+        return needsSync;
+    }
+
+    @Override
     public void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
-        data.writeCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
     }
 
     @Override
     public void load(@NotNull CompoundTag tag) {
+        getOrCreateFluxProxyDevice().setLevel();
         super.load(tag);
-        data.readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
-        transferHandler.syncBufferFromMatrix();
+        getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
+    }
+
+    @Override
+    public void onLoad() {
+        getOrCreateFluxProxyDevice().setLevel();
+        super.onLoad();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        getOrCreateFluxProxyDevice().hostChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        getOrCreateFluxProxyDevice().hostRemoved();
     }
 
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        data.writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
         return tag;
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
-        data.readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
-        transferHandler.syncBufferFromMatrix();
+        getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 
     @NotNull
     @Override
     public Component getDisplayName() {
-        return Component.translatable(MoreFluxStorageContent.INDUCTION_PORT_FLUX.get().getDescriptionId());
+        return Component.translatable(MoreFluxStorageContent.INDUCTION_PORT_FLUX_DESCRIPTION_ID);
     }
 
-    public IFluxGuiConnector getFluxConnector() {
-        return fluxConnector;
+    @Override
+    public TileFluxDevice getFluxProxyDevice() {
+        return getOrCreateFluxProxyDevice();
+    }
+
+    @Override
+    public int getFluxNetworkId() {
+        return getOrCreateFluxProxyDevice().getNetworkID();
+    }
+
+    @Override
+    public void setFluxOwner(UUID uuid) {
+        getOrCreateFluxProxyDevice().setOwnerUUID(uuid);
+        syncFluxData();
+    }
+
+    @Override
+    public boolean canOpenFluxGui(Player player) {
+        return getOrCreateFluxProxyDevice().canOpenGui(player);
+    }
+
+    @Override
+    public void writeFluxTag(CompoundTag tag, byte type) {
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, type);
+    }
+
+    @Override
+    public void readFluxTag(CompoundTag tag, byte type) {
+        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
     }
 
     public InteractionResult onSneakRightClick(Player player) {
-        if (level == null) return InteractionResult.PASS;
-        boolean newActive = !getActive();
-        setActive(newActive);
-        return InteractionResult.SUCCESS;
+        InteractionResult result = super.onSneakRightClick(player);
+        if (result.consumesAction()) {
+            transferHandler.syncBufferFromMatrix();
+            syncFluxData();
+        }
+        return result;
     }
 
     public long getFluxEnergyStored() {
-        return toFlux(getMatrixEnergyContainer().getEnergy());
+        MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
+        return energyContainer == null ? 0L : toFlux(energyContainer.getEnergy());
     }
 
-    public long getFluxMaxEnergyStored() {
-        return toFlux(getMatrixEnergyContainer().getMaxEnergy());
-    }
-
+    @NotNull
     @Override
-    public BlockPos getFluxGuiPos() {
-        return worldPosition;
+    public BlockEntity getTE() {
+        return this;
     }
 
+    @NotNull
     @Override
-    public Level getFluxGuiLevel() {
-        return level;
-    }
-
-    @Override
-    public ItemStack getFluxGuiDisplayStack() {
-        return new ItemStack(MoreFluxStorageContent.INDUCTION_PORT_FLUX_ITEM.get());
-    }
-
-    @Override
-    public AbstractFluxTransferHandler getFluxGuiTransferHandler() {
+    public AbstractFluxTransferHandler getProxyTransferHandler() {
+        if (level != null && !level.isClientSide) {
+            transferHandler.syncBufferFromMatrix();
+        }
         return transferHandler;
     }
 
+    @NotNull
     @Override
-    public int getFluxGuiFolderId() {
-        return 0;
+    public Component getProxyDisplayName() {
+        return getDisplayName();
     }
 
+    @NotNull
     @Override
-    public void onFluxGuiDataChanged() {
+    public ItemStack getProxyDisplayStack() {
+        return MoreFluxStorageContent.getInductionPortFluxStack();
+    }
+
+    private void syncFluxData() {
         setChanged();
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 11);
         }
+    }
+
+    private void syncTransferStateForTagWrite() {
+        if (level != null && !level.isClientSide) {
+            transferHandler.syncBufferFromMatrix();
+        }
+    }
+
+    private void writeTransferState(CompoundTag tag) {
+        long buffer = level != null && !level.isClientSide ? getFluxEnergyStored() : transferHandler.getBuffer();
+        tag.putLong("buffer", buffer);
+    }
+
+    private ProxyFluxDevice getOrCreateFluxProxyDevice() {
+        if (fluxProxyDevice == null) {
+            fluxProxyDevice = new ProxyFluxDevice(this, getType(), worldPosition, getBlockState());
+        }
+        return fluxProxyDevice;
+    }
+
+    private void onFluxGuiDataChanged() {
+        syncFluxData();
     }
 
     private MatrixEnergyContainer getMatrixEnergyContainer() {
         MatrixMultiblockData multiblock = getMultiblock();
-        return multiblock.getEnergyContainer();
+        return multiblock == null ? null : multiblock.getEnergyContainer();
     }
 
     private final class InductionPortTransferHandler extends AbstractFluxTransferHandler {
 
         private void syncBufferFromMatrix() {
-            setBuffer(getFluxEnergyStored());
+            if (level != null && !level.isClientSide) {
+                Objects.requireNonNull(level.getServer()).addTickable(() -> setBuffer(getFluxEnergyStored()));
+            }
         }
 
         private long getEffectiveFluxTransferLimit() {
-            long matrixLimit = toFlux(getMatrixEnergyContainer().getMaxTransfer());
+            MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
+            if (energyContainer == null) {
+                return 0L;
+            }
+            long matrixLimit = toFlux(energyContainer.getMaxTransfer()) - getAdded();
             if (getDisableLimit()) {
                 return matrixLimit;
             }
-            return Math.min(matrixLimit, getLogicLimit());
+            return Math.min(matrixLimit, getLimit());
         }
 
         @Override
@@ -165,22 +261,24 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
             }
 
             MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
+            if (energyContainer == null) {
+                return 0L;
+            }
             long freeSpace = toFlux(energyContainer.getMaxEnergy().subtract(energyContainer.getEnergy()));
             return Math.max(0L, Math.min(freeSpace, getEffectiveFluxTransferLimit()));
         }
 
         @Override
         public void addToBuffer(long amount) {
-            if (getActive()) {
-                return;
-            }
-
             long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit());
             if (allowed <= 0L) {
                 return;
             }
 
             MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
+            if (energyContainer == null) {
+                return;
+            }
             FloatingLong requested = toMekanism(allowed);
             FloatingLong remainder = energyContainer.insert(requested, Action.EXECUTE, AutomationType.INTERNAL);
             long accepted = toFlux(requested.subtract(remainder));
@@ -193,16 +291,15 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
 
         @Override
         public long removeFromBuffer(long amount) {
-            if (!getActive()) {
-                return 0L;
-            }
-
             long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit());
             if (allowed <= 0L) {
                 return 0L;
             }
 
             MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
+            if (energyContainer == null) {
+                return 0L;
+            }
             FloatingLong extracted = energyContainer.extract(toMekanism(allowed), Action.EXECUTE, AutomationType.INTERNAL);
             long removed = super.removeFromBuffer(toFlux(extracted));
             syncBufferFromMatrix();
@@ -210,35 +307,6 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements Fl
                 onFluxGuiDataChanged();
             }
             return removed;
-        }
-    }
-
-    private final class FluxConnector implements IFluxGuiConnector {
-
-        @Override
-        public FluxGuiConnectorData getFluxData() {
-            return data;
-        }
-
-        @Override
-        public Level getLevel() {
-            return TileInductionPortFlux.this.getLevel();
-        }
-
-        @Override
-        public BlockState getBlockState() {
-            return TileInductionPortFlux.this.getBlockState();
-        }
-
-        @Override
-        public @NotNull Component getDisplayName() {
-            return Component.translatable(MoreFluxStorageContent.INDUCTION_PORT_FLUX.get().getDescriptionId());
-        }
-
-        @NotNull
-        @Override
-        public ItemStack getDisplayStack() {
-            return getFluxGuiDisplayStack();
         }
     }
 }

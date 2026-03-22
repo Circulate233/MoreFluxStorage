@@ -37,8 +37,8 @@ config = "mixins.${mod_id}.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg
-#[[accessTransformers]]
-#file="META-INF/accesstransformer.cfg"
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
 
 # The coremods config file path is not configurable and is always loaded from META-INF/coremods.json
 
@@ -66,6 +66,14 @@ modId = "minecraft"
 type = "required"
 # This version range declares a minimum of the current minecraft version up to but not including the next major version
 versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+# Required dependency: Flux Networks
+[[dependencies."${mod_id}"]]
+modId = "fluxnetworks"
+type = "required"
+versionRange = "[0,)"
 ordering = "NONE"
 side = "BOTH"
 

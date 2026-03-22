@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "more_flux_storage:block/flux_accessor_flux"
+    }
+  }
+}

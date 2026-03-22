@@ -1,17 +1,22 @@
 package com.circulation.more_flux_storage.block;
 
-import com.circulation.more_flux_storage.api.IFluxGuiConnector;
+import com.circulation.more_flux_storage.api.IFluxProxyHost;
 import com.circulation.more_flux_storage.blockentity.TileInductionPortFlux;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,17 +25,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import sonar.fluxnetworks.api.FluxConstants;
 
+import java.util.List;
+
 public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
 
     protected AbstractFluxGuiBlock(Properties properties) {
         super(properties);
     }
 
-    public static @Nullable IFluxGuiConnector resolveFluxConnector(Level level, BlockPos pos) {
+    @NotNull
+    @Override
+    public RenderShape getRenderShape(@NotNull BlockState p_49232_) {
+        return RenderShape.MODEL;
+    }
+
+    public static @Nullable IFluxProxyHost resolveFluxHost(Level level, BlockPos pos) {
         if (level.getBlockState(pos).getBlock() instanceof AbstractFluxGuiBlock block) {
-            return block.getFluxConnector(level.getBlockEntity(pos));
+            return block.getFluxHost(level.getBlockEntity(pos));
         }
         return null;
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack p_49816_, @Nullable BlockGetter p_49817_, @NotNull List<Component> p_49818_, @NotNull TooltipFlag p_49819_) {
+
     }
 
     @Override
@@ -44,25 +62,26 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
         }
 
         var e = level.getBlockEntity(pos);
-        IFluxGuiConnector connector = getFluxConnector(e);
-        if (connector == null) {
+        IFluxProxyHost host = getFluxHost(e);
+        if (host == null) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
-        if (connector.getNetworkID() < 0) {
-            connector.setPlayerUUID(player.getUUID());
+        if (host.getFluxNetworkId() < 0) {
+            host.setFluxOwner(player.getUUID());
         }
-        if (!connector.canOpenFluxGui(player)) {
+        if (!host.canOpenFluxGui(player)) {
             return InteractionResult.FAIL;
         }
         if (player instanceof ServerPlayer serverPlayer) {
-            NetworkHooks.openScreen(serverPlayer, connector, buf -> {
+            MenuProvider provider = host.getFluxProxyDevice();
+            NetworkHooks.openScreen(serverPlayer, provider, buf -> {
                 buf.writeBoolean(true);
                 buf.writeBlockPos(pos);
                 CompoundTag tag = new CompoundTag();
-                connector.writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
+                host.writeFluxTag(tag, FluxConstants.NBT_TILE_UPDATE);
                 buf.writeNbt(tag);
             });
         }
@@ -74,19 +93,19 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
                             @Nullable LivingEntity placer, @NotNull ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
 
-        IFluxGuiConnector connector = getFluxConnector(level.getBlockEntity(pos));
-        if (connector != null) {
+        IFluxProxyHost host = getFluxHost(level.getBlockEntity(pos));
+        if (host != null) {
             CompoundTag tag = stack.getTagElement(FluxConstants.TAG_FLUX_DATA);
             if (tag != null) {
-                connector.readCustomTag(tag.copy(), FluxConstants.NBT_TILE_DROP);
+                host.readFluxTag(tag.copy(), FluxConstants.NBT_TILE_DROP);
             }
             if (placer instanceof Player player) {
-                connector.setPlayerUUID(player.getUUID());
+                host.setFluxOwner(player.getUUID());
             }
         }
     }
 
-    protected @Nullable IFluxGuiConnector getFluxConnector(@Nullable BlockEntity blockEntity) {
-        return blockEntity instanceof IFluxGuiConnector connector ? connector : null;
+    protected @Nullable IFluxProxyHost getFluxHost(@Nullable BlockEntity blockEntity) {
+        return blockEntity instanceof IFluxProxyHost host ? host : null;
     }
 }

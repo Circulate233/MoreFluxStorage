@@ -58,3 +58,14 @@ mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+
+[[accessTransformers]]
+file = "META-INF/accesstransformer.cfg"
+
+# Required dependency: Flux Networks
+[[dependencies."${mod_id}"]]
+modId = "fluxnetworks"
+mandatory = true
+versionRange = "[0,)"
+ordering = "NONE"
+side = "BOTH"

@@ -18,8 +18,8 @@ public abstract class TileEnergyPylonMixin {
             target = "Lnet/neoforged/neoforge/registries/DeferredHolder;get()Ljava/lang/Object;"
         )
     )
-    private static Object redirectBlockEntityType(DeferredHolder<?,?> instance) {
-        if (Utils.trigger()) {
+    private static Object redirectBlockEntityType(DeferredHolder<?, ?> instance) {
+        if (Utils.trigger() && MoreFluxStorageContent.ENERGY_PYLON_FLUX_BLOCK_ENTITY != null) {
             return MoreFluxStorageContent.ENERGY_PYLON_FLUX_BLOCK_ENTITY.get();
         }
         return instance.get();

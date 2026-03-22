@@ -1,6 +1,7 @@
 {
-  "parent": "block/cube_all",
+  "parent": "more_flux_storage:block/base_model",
   "textures": {
-    "all": "more_flux_storage:blocks/induction_port_flux"
+    "base": "mekanism:blocks/induction_casing",
+    "overlay": "fluxnetworks:items/fluxcore"
   }
 }

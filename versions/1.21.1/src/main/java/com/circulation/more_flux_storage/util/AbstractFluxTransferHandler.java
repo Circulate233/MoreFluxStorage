@@ -1,8 +1,8 @@
 package com.circulation.more_flux_storage.util;
 
-import sonar.fluxnetworks.common.connection.TransferHandler;
+import sonar.fluxnetworks.common.device.FluxStorageHandler;
 
-public abstract class AbstractFluxTransferHandler extends TransferHandler {
+public abstract class AbstractFluxTransferHandler extends FluxStorageHandler {
 
     private long added;
     private long removed;
@@ -11,24 +11,13 @@ public abstract class AbstractFluxTransferHandler extends TransferHandler {
         super(200000L);
     }
 
-    public int getLogicPriority() {
-        return getSurgeMode() ? -PRI_GAIN_MIN : Math.min(getRawPriority() - STORAGE_PRI_DIFF, -PRI_GAIN_MIN);
-    }
-
-    public void setRawPriority(int priority) {
-        setPriority(priority);
-    }
-
-    public long getLogicLimit() {
-        return getLimit();
-    }
-
-    public void setRawLimit(long limit) {
-        setLimit(limit);
+    @Override
+    public void onCycleStart() {
     }
 
     @Override
-    public void onCycleStart() {
+    public long getMaxEnergyStorage() {
+        return 0L;
     }
 
     @Override
@@ -65,18 +54,11 @@ public abstract class AbstractFluxTransferHandler extends TransferHandler {
         removed = 0L;
     }
 
-    public void reset() {
-        added = 0L;
-        removed = 0L;
-        mBuffer = 0L;
-        mChange = 0L;
-    }
-
     public void setBuffer(long buffer) {
         mBuffer = Math.max(0L, buffer);
     }
 
-    public void setChange(long change) {
-        mChange = change;
+    public long getAdded() {
+        return added;
     }
 }

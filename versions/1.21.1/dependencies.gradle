@@ -4,4 +4,8 @@ dependencies {
     implementation("io.codechicken:CodeChickenLib:1.21.1-4.6.1.526")
     implementation("curse.maven:draconic-evolution-223565:7584459")
     implementation("curse.maven:mekanism-268560:7621971")
+    implementation("org.appliedenergistics:guideme:21.1.15")
+    implementation("curse.maven:glodium-957920:5821676")
+    implementation("org.appliedenergistics:appliedenergistics2:19.2.17")
+    implementation("curse.maven:applied-flux-965012:7429565")
 }

@@ -1,16 +1,18 @@
 package com.circulation.more_flux_storage.block;
 
-import com.circulation.more_flux_storage.api.IFluxGuiConnector;
+import com.circulation.more_flux_storage.api.IFluxProxyHost;
 import com.circulation.more_flux_storage.blockentity.TileInductionPortFlux;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.mojang.serialization.MapCodec;
 import mekanism.common.tile.base.TileEntityMekanism;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -20,12 +22,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class BlockInductionPortFlux extends AbstractFluxGuiBlock {
 
     public static final MapCodec<BlockInductionPortFlux> CODEC = simpleCodec(BlockInductionPortFlux::new);
 
     public BlockInductionPortFlux() {
-        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F));
+        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion());
     }
 
     private BlockInductionPortFlux(BlockBehaviour.Properties properties) {
@@ -38,26 +42,25 @@ public class BlockInductionPortFlux extends AbstractFluxGuiBlock {
     }
 
     @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
-        return RenderShape.MODEL;
-    }
-
-    @Override
     public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new TileInductionPortFlux(pos, state);
     }
 
     @Override
-    protected @Nullable IFluxGuiConnector getFluxConnector(@Nullable BlockEntity blockEntity) {
-        return blockEntity instanceof TileInductionPortFlux tile ? tile.getFluxConnector() : null;
+    protected @Nullable IFluxProxyHost getFluxHost(@Nullable BlockEntity blockEntity) {
+        return blockEntity instanceof TileInductionPortFlux tile ? tile : null;
     }
 
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state,
-                                                                             @NotNull BlockEntityType<T> blockEntityType) {
+                                                                            @NotNull BlockEntityType<T> blockEntityType) {
+        BlockEntityType<TileInductionPortFlux> inductionPortType = MoreFluxStorageContent.getInductionPortFluxBlockEntityType();
+        if (inductionPortType == null) {
+            return null;
+        }
         return createTickerHelper(
             blockEntityType,
-            MoreFluxStorageContent.INDUCTION_PORT_FLUX_BLOCK_ENTITY.get(),
+            inductionPortType,
             level.isClientSide ? TileEntityMekanism::tickClient : TileEntityMekanism::tickServer
         );
     }
@@ -75,22 +78,8 @@ public class BlockInductionPortFlux extends AbstractFluxGuiBlock {
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(@NotNull BlockState state) {
-        return true;
-    }
-
-    @Override
-    public int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos) {
-        if (!(level.getBlockEntity(pos) instanceof TileInductionPortFlux tile)) {
-            return 0;
-        }
-
-        long capacity = tile.getFluxMaxEnergyStored();
-        if (capacity <= 0L) {
-            return 0;
-        }
-
-        double fillRatio = (double) tile.getFluxEnergyStored() / (double) capacity;
-        return Mth.clamp((int) (fillRatio * 15.0D), 0, 15);
+    public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
+        components.add(Component.translatable("block.more_flux_storage.induction_port_flux.tooltip")
+            .withStyle(style -> style.withColor(0x808080).withItalic(true)));
     }
 }

@@ -2,28 +2,33 @@ package com.circulation.more_flux_storage.blockentity;
 
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyCore;
 import com.brandon3055.draconicevolution.blocks.tileentity.TileEnergyPylon;
-import com.circulation.more_flux_storage.api.IFluxGuiConnector;
+import com.circulation.more_flux_storage.api.IFluxProxyHost;
 import com.circulation.more_flux_storage.registry.MoreFluxStorageContent;
 import com.circulation.more_flux_storage.util.AbstractFluxTransferHandler;
-import com.circulation.more_flux_storage.util.FluxGuiConnectorData;
+import com.circulation.more_flux_storage.util.ProxyFluxDevice;
 import com.circulation.more_flux_storage.util.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import sonar.fluxnetworks.api.FluxConstants;
-import sonar.fluxnetworks.common.connection.FluxNetworkData;
+import sonar.fluxnetworks.common.device.TileFluxDevice;
 
-public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConnectorData.Host {
+import java.util.Objects;
+import java.util.UUID;
 
-    private final FluxGuiConnectorData data = new FluxGuiConnectorData(this);
+@SuppressWarnings("ReturnOfInnerClass")
+public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHost, ProxyFluxDevice.Host {
+
     private final EnergyPylonTransferHandler transferHandler = new EnergyPylonTransferHandler();
-    private final IFluxGuiConnector fluxConnector = new FluxConnector();
+    private ProxyFluxDevice fluxProxyDevice;
     private int fluxTick;
-    private boolean init;
 
     public TileEnergyPylonFlux(BlockPos pos, BlockState state) {
         super(Utils.trigger(pos), state);
@@ -35,116 +40,194 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
 
     @Override
     public void tick() {
-        if (!init) {
-
-        }
-        if (level != null && !level.isClientSide && fluxTick++ % 20 == 0 && getCore() == null) {
-            selectNextCore();
-        }
-
         super.tick();
-        transferHandler.syncBufferFromCore();
+        if (level != null && !level.isClientSide) {
+            if (fluxTick++ % 20 == 0 && getCore() == null) {
+                selectNextCore();
+            }
+            transferHandler.syncBufferFromCore();
+            getOrCreateFluxProxyDevice().hostServerTick();
+        }
     }
 
-    public boolean hasCoreBinding() {
-        return coreOffset.notNull();
+    @Override
+    public void onLoad() {
+        getOrCreateFluxProxyDevice().setLevel();
+        super.onLoad();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        getOrCreateFluxProxyDevice().hostChunkUnloaded();
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        getOrCreateFluxProxyDevice().hostRemoved();
     }
 
     @Override
     public void writeExtraNBT(CompoundTag tag) {
         super.writeExtraNBT(tag);
-        data.writeCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
     }
 
     @Override
     public void readExtraNBT(CompoundTag tag) {
         super.readExtraNBT(tag);
-        data.readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
-        transferHandler.syncBufferFromCore();
+        getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
     }
 
     @Override
     public @NotNull CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        data.writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
         return tag;
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
-        data.readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
-        transferHandler.syncBufferFromCore();
+        getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 
     @NotNull
     @Override
     public Component getDisplayName() {
-        return Component.translatable(MoreFluxStorageContent.ENERGY_PYLON_FLUX.get().getDescriptionId());
-    }
-
-    public FluxGuiConnectorData getFluxData() {
-        return data;
-    }
-
-    public IFluxGuiConnector getFluxConnector() {
-        return fluxConnector;
+        return Component.translatable(MoreFluxStorageContent.ENERGY_PYLON_FLUX_DESCRIPTION_ID);
     }
 
     @Override
-    public BlockPos getFluxGuiPos() {
-        return worldPosition;
+    public TileFluxDevice getFluxProxyDevice() {
+        return getOrCreateFluxProxyDevice();
     }
 
     @Override
-    public Level getFluxGuiLevel() {
-        return level;
+    public int getFluxNetworkId() {
+        return getOrCreateFluxProxyDevice().getNetworkID();
     }
 
     @Override
-    public ItemStack getFluxGuiDisplayStack() {
-        return new ItemStack(MoreFluxStorageContent.ENERGY_PYLON_FLUX_ITEM.get());
+    public void setFluxOwner(UUID uuid) {
+        getOrCreateFluxProxyDevice().setOwnerUUID(uuid);
+        syncFluxData();
     }
 
     @Override
-    public AbstractFluxTransferHandler getFluxGuiTransferHandler() {
+    public boolean canOpenFluxGui(Player player) {
+        return getOrCreateFluxProxyDevice().canOpenGui(player);
+    }
+
+    @Override
+    public void writeFluxTag(CompoundTag tag, byte type) {
+        syncTransferStateForTagWrite();
+        writeTransferState(tag);
+        getOrCreateFluxProxyDevice().writeCustomTag(tag, type);
+    }
+
+    @Override
+    public void readFluxTag(CompoundTag tag, byte type) {
+        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+    }
+
+    @NotNull
+    @Override
+    public BlockEntity getTE() {
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public AbstractFluxTransferHandler getProxyTransferHandler() {
+        if (level != null && !level.isClientSide) {
+            transferHandler.syncBufferFromCore();
+        }
         return transferHandler;
     }
 
+    @NotNull
     @Override
-    public int getFluxGuiFolderId() {
-        return 0;
+    public Component getProxyDisplayName() {
+        return getDisplayName();
     }
 
+    @NotNull
     @Override
-    public void onFluxGuiDataChanged() {
+    public ItemStack getProxyDisplayStack() {
+        return MoreFluxStorageContent.getEnergyPylonFluxStack();
+    }
+
+    private void syncFluxData() {
         dirtyBlock();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 11);
+        }
         updateBlock();
+    }
+
+    private void syncTransferStateForTagWrite() {
+        if (level != null && !level.isClientSide) {
+            transferHandler.syncBufferFromCore();
+        }
+    }
+
+    private void writeTransferState(CompoundTag tag) {
+        long buffer = transferHandler.getBuffer();
+        if (level != null && !level.isClientSide) {
+            TileEnergyCore core = getCore();
+            buffer = core == null ? 0L : core.energy.getOPStored();
+        }
+        tag.putLong("buffer", buffer);
+    }
+
+    private ProxyFluxDevice getOrCreateFluxProxyDevice() {
+        if (fluxProxyDevice == null) {
+            fluxProxyDevice = new ProxyFluxDevice(this, getType(), worldPosition, getBlockState());
+        }
+        return fluxProxyDevice;
+    }
+
+    private void onFluxGuiDataChanged() {
+        syncFluxData();
     }
 
     private final class EnergyPylonTransferHandler extends AbstractFluxTransferHandler {
 
         private void syncBufferFromCore() {
-            if (level == null) return;
-            TileEnergyCore core = getCore();
-            setBuffer(core == null ? 0L : core.energy.getOPStored());
+            if (level != null && !level.isClientSide) {
+                Objects.requireNonNull(level.getServer()).addTickable(() -> {
+                    TileEnergyCore core = getCore();
+                    setBuffer(core == null ? 0L : core.energy.getOPStored());
+                });
+            }
         }
 
         @Override
         public long getRequest() {
             TileEnergyCore core = getCore();
-            if (core == null || !ioMode.get().canReceive()) {
+            if (core == null) {
                 return 0L;
             }
 
             long freeSpace = Math.max(0L, core.energy.getMaxOPStored() - core.energy.getUncappedStored());
-            return getDisableLimit() ? freeSpace : Math.min(freeSpace, getLogicLimit());
+            return Math.min(freeSpace, getLimit());
         }
 
         @Override
         public void addToBuffer(long amount) {
             TileEnergyCore core = getCore();
-            if (core == null || !ioMode.get().canReceive()) {
+            if (core == null) {
                 return;
             }
 
@@ -175,35 +258,6 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements FluxGuiConne
         @Override
         public void onCycleStart() {
             syncBufferFromCore();
-        }
-    }
-
-    private final class FluxConnector implements IFluxGuiConnector {
-
-        @Override
-        public FluxGuiConnectorData getFluxData() {
-            return data;
-        }
-
-        @Override
-        public Level getLevel() {
-            return TileEnergyPylonFlux.this.getLevel();
-        }
-
-        @Override
-        public BlockState getBlockState() {
-            return TileEnergyPylonFlux.this.getBlockState();
-        }
-
-        @Override
-        public @NotNull Component getDisplayName() {
-            return Component.translatable(MoreFluxStorageContent.ENERGY_PYLON_FLUX.get().getDescriptionId());
-        }
-
-        @NotNull
-        @Override
-        public ItemStack getDisplayStack() {
-            return getFluxGuiDisplayStack();
         }
     }
 }

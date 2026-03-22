@@ -392,6 +392,14 @@ repositories {
             includeGroup("com.github.bsideup.jabel")
         }
     }
+    maven {
+        name = "GuideME Snapshots"
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        content {
+            includeModule("org.appliedenergistics", "guideme")
+        }
+    }
+    mavenCentral()
     mavenLocal()
 }
 
@@ -453,9 +461,9 @@ dependencies {
 
 if (isLegacyRfg && propertyBool("use_access_transformer")) {
     propertyStringList("access_transformer_locations").forEach { location ->
-        var fileLocation = file("$projectDir/src/main/resources/$location")
+        var fileLocation = file("$projectDir/src/main/resources/META-INF/$location")
         if (!fileLocation.exists()) {
-            fileLocation = rootProject.file("src/main/resources/$location")
+            fileLocation = rootProject.file("src/main/resources/META-INF/$location")
         }
 
         if (!fileLocation.exists()) {
