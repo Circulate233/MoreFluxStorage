@@ -2,3 +2,5 @@ tile.more_flux_storage.energy_pylon_flux.name=通量能源端口
 tile.more_flux_storage.induction_port_flux.name=通量输导端口
 block.more_flux_storage.energy_pylon_flux.tooltip=真龙之相，万灵所钟
 block.more_flux_storage.induction_port_flux.tooltip=万化之能，归于一相
+
+itemGroup.more_flux_storage=更多通量存储

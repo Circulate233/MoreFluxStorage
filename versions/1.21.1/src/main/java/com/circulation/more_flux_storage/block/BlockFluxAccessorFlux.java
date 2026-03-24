@@ -25,7 +25,7 @@ public class BlockFluxAccessorFlux extends AbstractFluxGuiBlock {
     public static final MapCodec<BlockFluxAccessorFlux> CODEC = simpleCodec(BlockFluxAccessorFlux::new);
 
     public BlockFluxAccessorFlux() {
-        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F));
+        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).sound(net.minecraft.world.level.block.SoundType.METAL));
     }
 
     private BlockFluxAccessorFlux(BlockBehaviour.Properties properties) {
@@ -60,6 +60,6 @@ public class BlockFluxAccessorFlux extends AbstractFluxGuiBlock {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
         components.add(Component.translatable("block.more_flux_storage.flux_accessor_flux.tooltip")
-            .withStyle(style -> style.withColor(0x808080).withItalic(true)));
+                                .withStyle(style -> style.withColor(0x808080).withItalic(true)));
     }
 }

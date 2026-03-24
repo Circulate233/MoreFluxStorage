@@ -8,4 +8,5 @@ dependencies {
     implementation("curse.maven:glodium-957920:5821676")
     implementation("org.appliedenergistics:appliedenergistics2:19.2.17")
     implementation("curse.maven:applied-flux-965012:7429565")
+    runtimeOnly("mezz.jei:jei-1.21.1-neoforge:19.27.0.340")
 }

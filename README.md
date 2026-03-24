@@ -17,7 +17,6 @@
 
 ---
 
-## English Contents
 # More Flux Storage
 
 ## Overview

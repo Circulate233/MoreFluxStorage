@@ -17,7 +17,7 @@ public abstract class AbstractFluxTransferHandler extends FluxStorageHandler {
 
     @Override
     public long getMaxEnergyStorage() {
-        return 0L;
+        return Long.MAX_VALUE;
     }
 
     @Override
@@ -60,5 +60,25 @@ public abstract class AbstractFluxTransferHandler extends FluxStorageHandler {
 
     public long getAdded() {
         return added;
+    }
+
+    public long getRemoved() {
+        return removed;
+    }
+
+    protected long getRemainingAddLimit() {
+        long limit = getLimit();
+        if (limit == Long.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        return Math.max(0L, limit - added);
+    }
+
+    protected long getRemainingRemoveLimit() {
+        long limit = getLimit();
+        if (limit == Long.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        return Math.max(0L, limit - removed);
     }
 }

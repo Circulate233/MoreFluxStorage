@@ -35,7 +35,9 @@ public abstract class AbstractFluxConnectorBlock extends Block implements ITileE
         super(Material.IRON);
         this.setRegistryName(new ResourceLocation(MoreFluxStorage.MOD_ID, name))
             .setTranslationKey(MoreFluxStorage.MOD_ID + "." + name)
-            .setCreativeTab(MoreFluxStorage.CREATIVE_TAB);
+            .setCreativeTab(MoreFluxStorage.CREATIVE_TAB)
+            .setHardness(5.0F)
+            .setResistance(12.0F);
 
         TileEntity.register(MoreFluxStorage.MOD_ID + ":" + name, tileEntityClass);
     }

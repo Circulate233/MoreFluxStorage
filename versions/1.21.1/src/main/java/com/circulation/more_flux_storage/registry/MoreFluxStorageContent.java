@@ -54,32 +54,29 @@ public final class MoreFluxStorageContent {
     public static final @Nullable DeferredItem<Item> FLUX_ACCESSOR_FLUX_ITEM = HAS_APPFLUX
         ? ITEMS.register("flux_accessor_flux", () -> new BlockItem(FLUX_ACCESSOR_FLUX.get(), new Item.Properties()))
         : null;
-    public static final @Nullable DeferredHolder<BlockEntityType<?>, BlockEntityType<TileFluxAccessorFlux>> FLUX_ACCESSOR_FLUX_BLOCK_ENTITY = HAS_APPFLUX
-        ? BLOCK_ENTITY_TYPES.register("flux_accessor_flux", () -> BlockEntityType.Builder.of(TileFluxAccessorFlux::new, FLUX_ACCESSOR_FLUX.get()).build(null))
-        : null;
-
     public static final @Nullable DeferredBlock<BlockInductionPortFlux> INDUCTION_PORT_FLUX = HAS_MEKANISM
         ? BLOCKS.register("induction_port_flux", BlockInductionPortFlux::new)
+        : null;    public static final @Nullable DeferredHolder<BlockEntityType<?>, BlockEntityType<TileFluxAccessorFlux>> FLUX_ACCESSOR_FLUX_BLOCK_ENTITY = HAS_APPFLUX
+        ? BLOCK_ENTITY_TYPES.register("flux_accessor_flux", () -> BlockEntityType.Builder.of(TileFluxAccessorFlux::new, FLUX_ACCESSOR_FLUX.get()).build(null))
         : null;
     public static final @Nullable DeferredItem<Item> INDUCTION_PORT_FLUX_ITEM = HAS_MEKANISM
         ? ITEMS.register("induction_port_flux", () -> new BlockItem(INDUCTION_PORT_FLUX.get(), new Item.Properties()))
         : null;
-    public static final @Nullable DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInductionPortFlux>> INDUCTION_PORT_FLUX_BLOCK_ENTITY = HAS_MEKANISM
-        ? BLOCK_ENTITY_TYPES.register("induction_port_flux", () -> BlockEntityType.Builder.of(TileInductionPortFlux::new, INDUCTION_PORT_FLUX.get()).build(null))
-        : null;
-
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register(
         "main",
         () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.more_flux_storage"))
-            .icon(MoreFluxStorageContent::createCreativeTabIcon)
-            .displayItems((parameters, output) -> {
-                acceptIfPresent(output, ENERGY_PYLON_FLUX_ITEM);
-                acceptIfPresent(output, FLUX_ACCESSOR_FLUX_ITEM);
-                acceptIfPresent(output, INDUCTION_PORT_FLUX_ITEM);
-            })
-            .build()
+                             .title(Component.translatable("itemGroup.more_flux_storage"))
+                             .icon(MoreFluxStorageContent::createCreativeTabIcon)
+                             .displayItems((parameters, output) -> {
+                                 acceptIfPresent(output, ENERGY_PYLON_FLUX_ITEM);
+                                 acceptIfPresent(output, FLUX_ACCESSOR_FLUX_ITEM);
+                                 acceptIfPresent(output, INDUCTION_PORT_FLUX_ITEM);
+                             })
+                             .build()
     );
+    public static final @Nullable DeferredHolder<BlockEntityType<?>, BlockEntityType<TileInductionPortFlux>> INDUCTION_PORT_FLUX_BLOCK_ENTITY = HAS_MEKANISM
+        ? BLOCK_ENTITY_TYPES.register("induction_port_flux", () -> BlockEntityType.Builder.of(TileInductionPortFlux::new, INDUCTION_PORT_FLUX.get()).build(null))
+        : null;
 
     private MoreFluxStorageContent() {
     }
@@ -139,4 +136,6 @@ public final class MoreFluxStorageContent {
             output.accept(item.get());
         }
     }
+
+
 }

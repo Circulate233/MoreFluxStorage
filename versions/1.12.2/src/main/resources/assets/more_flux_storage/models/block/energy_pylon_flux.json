@@ -1,6 +1,7 @@
 {
   "parent": "more_flux_storage:block/base_model",
   "textures": {
+    "all": "draconicevolution:blocks/energy_pylon/energy_pylon_active_face",
     "base": "draconicevolution:blocks/energy_pylon/energy_pylon_active_face",
     "overlay": "fluxnetworks:items/fluxcore"
   }

@@ -399,6 +399,16 @@ repositories {
             includeModule("org.appliedenergistics", "guideme")
         }
     }
+    maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = uri("https://maven.blamejared.com/")
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = uri("https://modmaven.dev")
+    }
     mavenCentral()
     mavenLocal()
 }

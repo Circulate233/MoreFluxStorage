@@ -34,16 +34,22 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
         super(properties);
     }
 
-    @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
-        return RenderShape.MODEL;
-    }
-
     public static @Nullable IFluxProxyHost resolveFluxHost(Level level, BlockPos pos) {
         if (level.getBlockState(pos).getBlock() instanceof AbstractFluxGuiBlock block) {
             return block.getFluxHost(level.getBlockEntity(pos));
         }
         return null;
+    }
+
+    @Nullable
+    private static CompoundTag readFluxData(ItemStack stack) {
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        return tag.contains(FLUX_DATA_TAG, Tag.TAG_COMPOUND) ? tag.getCompound(FLUX_DATA_TAG) : null;
+    }
+
+    @Override
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
@@ -121,11 +127,5 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
 
     protected @Nullable IFluxProxyHost getFluxHost(@Nullable BlockEntity blockEntity) {
         return blockEntity instanceof IFluxProxyHost host ? host : null;
-    }
-
-    @Nullable
-    private static CompoundTag readFluxData(ItemStack stack) {
-        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        return tag.contains(FLUX_DATA_TAG, Tag.TAG_COMPOUND) ? tag.getCompound(FLUX_DATA_TAG) : null;
     }
 }

@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ACA",
+    "BDB",
+    "AEA"
+  ],
+  "key": {
+    "A": {
+      "item": "appflux:energy_processor"
+    },
+    "B": {
+      "item": "fluxnetworks:flux_block"
+    },
+    "C": {
+      "item": "fluxnetworks:flux_point"
+    },
+    "D": {
+      "item": "appflux:flux_accessor"
+    },
+    "E": {
+      "item": "fluxnetworks:flux_plug"
+    }
+  },
+  "result": {
+    "item": "more_flux_storage:flux_accessor_flux",
+    "count": 1
+  }
+}

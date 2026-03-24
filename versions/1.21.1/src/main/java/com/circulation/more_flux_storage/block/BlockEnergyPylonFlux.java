@@ -25,7 +25,7 @@ public class BlockEnergyPylonFlux extends AbstractFluxGuiBlock {
     public static final MapCodec<BlockEnergyPylonFlux> CODEC = simpleCodec(BlockEnergyPylonFlux::new);
 
     public BlockEnergyPylonFlux() {
-        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion());
+        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion().sound(net.minecraft.world.level.block.SoundType.METAL));
     }
 
     private BlockEnergyPylonFlux(BlockBehaviour.Properties properties) {
@@ -60,6 +60,6 @@ public class BlockEnergyPylonFlux extends AbstractFluxGuiBlock {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
         components.add(Component.translatable("block.more_flux_storage.energy_pylon_flux.tooltip")
-            .withStyle(style -> style.withColor(0x808080).withItalic(true)));
+                                .withStyle(style -> style.withColor(0x808080).withItalic(true)));
     }
 }

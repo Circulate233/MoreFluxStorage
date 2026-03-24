@@ -8,4 +8,5 @@ dependencies {
     modImplementation("curse.maven:glodium-957920:5226922")
     modImplementation("curse.maven:applied-energistics-2-223794:6357138")
     modImplementation("curse.maven:applied-flux-965012:7651647")
+    modImplementation("mezz.jei:jei-1.20.1-forge:15.20.0.129")
 }

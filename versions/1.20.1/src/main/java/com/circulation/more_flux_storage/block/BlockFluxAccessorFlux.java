@@ -22,7 +22,7 @@ import java.util.List;
 public class BlockFluxAccessorFlux extends AbstractFluxGuiBlock {
 
     public BlockFluxAccessorFlux() {
-        super(BlockBehaviour.Properties.of().strength(5.0F, 12.0F));
+        super(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).sound(net.minecraft.world.level.block.SoundType.METAL));
     }
 
     @Override

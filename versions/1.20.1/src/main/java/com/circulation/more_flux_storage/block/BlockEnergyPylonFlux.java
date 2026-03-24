@@ -23,7 +23,7 @@ import java.util.List;
 public class BlockEnergyPylonFlux extends AbstractFluxGuiBlock {
 
     public BlockEnergyPylonFlux() {
-        super(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion());
+        super(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion().sound(net.minecraft.world.level.block.SoundType.METAL));
     }
 
     @Override

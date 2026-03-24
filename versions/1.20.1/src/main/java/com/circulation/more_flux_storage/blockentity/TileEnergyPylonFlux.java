@@ -216,22 +216,23 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
         @Override
         public long getRequest() {
             TileEnergyCore core = getCore();
-            if (core == null) {
+            if (core == null || !ioMode.get().canReceive()) {
                 return 0L;
             }
 
             long freeSpace = Math.max(0L, core.energy.getMaxOPStored() - core.energy.getUncappedStored());
-            return Math.min(freeSpace, getLimit());
+            return Math.min(freeSpace, getRemainingAddLimit());
         }
 
         @Override
         public void addToBuffer(long amount) {
             TileEnergyCore core = getCore();
-            if (core == null) {
+            long allowed = Math.min(Math.max(0L, amount), getRemainingAddLimit());
+            if (core == null || !ioMode.get().canReceive() || allowed <= 0L) {
                 return;
             }
 
-            long received = core.energy.receiveOP(Math.max(0L, amount), false);
+            long received = core.energy.receiveOP(allowed, false);
             super.addToBuffer(received);
             syncBufferFromCore();
             if (received > 0L) {
@@ -242,11 +243,12 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
         @Override
         public long removeFromBuffer(long amount) {
             TileEnergyCore core = getCore();
-            if (core == null || !ioMode.get().canExtract()) {
+            long allowed = Math.min(Math.max(0L, amount), getRemainingRemoveLimit());
+            if (core == null || !ioMode.get().canExtract() || allowed <= 0L) {
                 return 0L;
             }
 
-            long extracted = core.energy.extractOP(Math.max(0L, amount), false);
+            long extracted = core.energy.extractOP(allowed, false);
             long removed = super.removeFromBuffer(extracted);
             syncBufferFromCore();
             if (removed > 0L) {

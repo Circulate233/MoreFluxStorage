@@ -57,11 +57,11 @@ public final class MoreFluxStorageContent {
         : null;
     public static final @Nullable RegistryObject<BlockInductionPortFlux> INDUCTION_PORT_FLUX = HAS_MEKANISM
         ? BLOCKS.register("induction_port_flux", BlockInductionPortFlux::new)
-        : null;    public static final @Nullable RegistryObject<BlockEntityType<TileFluxAccessorFlux>> FLUX_ACCESSOR_FLUX_BLOCK_ENTITY = HAS_APPFLUX
-        ? BLOCK_ENTITY_TYPES.register("flux_accessor_flux", () -> BlockEntityType.Builder.of(TileFluxAccessorFlux::new, FLUX_ACCESSOR_FLUX.get()).build(null))
         : null;
     public static final @Nullable RegistryObject<Item> INDUCTION_PORT_FLUX_ITEM = HAS_MEKANISM
         ? ITEMS.register("induction_port_flux", () -> new BlockItem(INDUCTION_PORT_FLUX.get(), new Item.Properties()))
+        : null;    public static final @Nullable RegistryObject<BlockEntityType<TileFluxAccessorFlux>> FLUX_ACCESSOR_FLUX_BLOCK_ENTITY = HAS_APPFLUX
+        ? BLOCK_ENTITY_TYPES.register("flux_accessor_flux", () -> BlockEntityType.Builder.of(TileFluxAccessorFlux::new, FLUX_ACCESSOR_FLUX.get()).build(null))
         : null;
     public static final RegistryObject<CreativeModeTab> MAIN_CREATIVE_MODE_TAB = CREATIVE_MODE_TABS.register(
         "main",
@@ -137,6 +137,8 @@ public final class MoreFluxStorageContent {
         MENU_TYPES.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
     }
+
+
 
 
 }

@@ -29,7 +29,7 @@ public class BlockInductionPortFlux extends AbstractFluxGuiBlock {
     public static final MapCodec<BlockInductionPortFlux> CODEC = simpleCodec(BlockInductionPortFlux::new);
 
     public BlockInductionPortFlux() {
-        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion());
+        this(BlockBehaviour.Properties.of().strength(5.0F, 12.0F).noOcclusion().sound(net.minecraft.world.level.block.SoundType.METAL));
     }
 
     private BlockInductionPortFlux(BlockBehaviour.Properties properties) {
@@ -80,6 +80,6 @@ public class BlockInductionPortFlux extends AbstractFluxGuiBlock {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> components, @NotNull TooltipFlag flag) {
         components.add(Component.translatable("block.more_flux_storage.induction_port_flux.tooltip")
-            .withStyle(style -> style.withColor(0x808080).withItalic(true)));
+                                .withStyle(style -> style.withColor(0x808080).withItalic(true)));
     }
 }

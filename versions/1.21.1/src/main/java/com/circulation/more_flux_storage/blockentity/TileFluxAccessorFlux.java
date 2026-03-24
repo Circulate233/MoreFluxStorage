@@ -212,20 +212,18 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
             }
 
             long receivable = storage.getInventory().insert(FluxKey.of(EnergyType.FE), Long.MAX_VALUE - 1, Actionable.SIMULATE, getActionSource());
-            if (getDisableLimit()) {
-                return receivable;
-            }
-            return Math.min(receivable, getLimit());
+            return Math.min(receivable, getRemainingAddLimit());
         }
 
         @Override
         public void addToBuffer(long amount) {
             IStorageService storage = getStorageService();
-            if (storage == null) {
+            long allowed = Math.min(Math.max(0L, amount), getRemainingAddLimit());
+            if (storage == null || allowed <= 0L) {
                 return;
             }
 
-            long inserted = storage.getInventory().insert(FluxKey.of(EnergyType.FE), Math.max(0L, amount), Actionable.MODULATE, getActionSource());
+            long inserted = storage.getInventory().insert(FluxKey.of(EnergyType.FE), allowed, Actionable.MODULATE, getActionSource());
             super.addToBuffer(inserted);
             syncBufferFromStorage();
             if (inserted > 0L) {
@@ -236,11 +234,12 @@ public class TileFluxAccessorFlux extends AENetworkedBlockEntity implements IFlu
         @Override
         public long removeFromBuffer(long amount) {
             IStorageService storage = getStorageService();
-            if (storage == null) {
+            long allowed = Math.min(Math.max(0L, amount), getRemainingRemoveLimit());
+            if (storage == null || allowed <= 0L) {
                 return 0L;
             }
 
-            long extracted = storage.getInventory().extract(FluxKey.of(EnergyType.FE), Math.max(0L, amount), Actionable.MODULATE, getActionSource());
+            long extracted = storage.getInventory().extract(FluxKey.of(EnergyType.FE), allowed, Actionable.MODULATE, getActionSource());
             long removed = super.removeFromBuffer(extracted);
             syncBufferFromStorage();
             if (removed > 0L) {

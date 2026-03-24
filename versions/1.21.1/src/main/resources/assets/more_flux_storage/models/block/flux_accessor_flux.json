@@ -1,6 +1,7 @@
 {
   "parent": "more_flux_storage:block/base_model",
   "textures": {
+    "all": "appflux:block/flux_accessor",
     "base": "appflux:block/flux_accessor",
     "overlay": "fluxnetworks:item/flux_core"
   }

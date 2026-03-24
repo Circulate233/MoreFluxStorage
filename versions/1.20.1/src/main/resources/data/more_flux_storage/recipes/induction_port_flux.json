@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ACA",
+    "BDB",
+    "AEA"
+  ],
+  "key": {
+    "A": {
+      "item": "mekanism:ultimate_control_circuit"
+    },
+    "B": {
+      "item": "mekanism:induction_port"
+    },
+    "C": {
+      "item": "fluxnetworks:flux_point"
+    },
+    "D": {
+      "item": "fluxnetworks:flux_block"
+    },
+    "E": {
+      "item": "fluxnetworks:flux_plug"
+    }
+  },
+  "result": {
+    "item": "more_flux_storage:induction_port_flux",
+    "count": 1
+  }
+}

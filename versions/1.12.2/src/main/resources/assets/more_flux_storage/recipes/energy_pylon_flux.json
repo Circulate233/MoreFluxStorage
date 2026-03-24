@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ACA",
+    "BDB",
+    "AEA"
+  ],
+  "key": {
+    "A": {
+      "item": "draconicevolution:draconic_core"
+    },
+    "B": {
+      "item": "draconicevolution:energy_pylon"
+    },
+    "C": {
+      "item": "fluxnetworks:fluxpoint"
+    },
+    "D": {
+      "item": "fluxnetworks:fluxblock"
+    },
+    "E": {
+      "item": "fluxnetworks:fluxplug"
+    }
+  },
+  "result": {
+    "item": "more_flux_storage:energy_pylon_flux",
+    "count": 1
+  }
+}

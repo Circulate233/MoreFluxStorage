@@ -33,17 +33,17 @@ public abstract class AbstractFluxGuiBlock extends BaseEntityBlock {
         super(properties);
     }
 
-    @NotNull
-    @Override
-    public RenderShape getRenderShape(@NotNull BlockState p_49232_) {
-        return RenderShape.MODEL;
-    }
-
     public static @Nullable IFluxProxyHost resolveFluxHost(Level level, BlockPos pos) {
         if (level.getBlockState(pos).getBlock() instanceof AbstractFluxGuiBlock block) {
             return block.getFluxHost(level.getBlockEntity(pos));
         }
         return null;
+    }
+
+    @NotNull
+    @Override
+    public RenderShape getRenderShape(@NotNull BlockState p_49232_) {
+        return RenderShape.MODEL;
     }
 
     @Override

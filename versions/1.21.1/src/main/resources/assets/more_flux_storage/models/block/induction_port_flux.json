@@ -1,6 +1,7 @@
 {
   "parent": "more_flux_storage:block/base_model",
   "textures": {
+    "all": "mekanism:block/induction_casing",
     "base": "mekanism:block/induction_casing",
     "overlay": "fluxnetworks:item/flux_core"
   }

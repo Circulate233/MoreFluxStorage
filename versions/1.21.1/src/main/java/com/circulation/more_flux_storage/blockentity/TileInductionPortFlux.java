@@ -230,16 +230,13 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
             setBuffer(getFluxEnergyStored());
         }
 
-        private long getEffectiveFluxTransferLimit() {
+        private long getEffectiveFluxTransferLimit(long transferredThisCycle, long remainingFluxLimit) {
             MatrixEnergyContainer energyContainer = getMatrixEnergyContainer();
             if (energyContainer == null) {
                 return 0L;
             }
-            long matrixLimit = toFlux(energyContainer.getMaxTransfer()) - getAdded();
-            if (getDisableLimit()) {
-                return matrixLimit;
-            }
-            return Math.min(matrixLimit, getLimit());
+            long matrixLimit = Math.max(0L, toFlux(energyContainer.getMaxTransfer()) - transferredThisCycle);
+            return Math.min(matrixLimit, remainingFluxLimit);
         }
 
         @Override
@@ -258,12 +255,12 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
                 return 0L;
             }
             long freeSpace = toFlux(energyContainer.getMaxEnergy() - energyContainer.getEnergy());
-            return Math.max(0L, Math.min(freeSpace, getEffectiveFluxTransferLimit()));
+            return Math.max(0L, Math.min(freeSpace, getEffectiveFluxTransferLimit(getAdded(), getRemainingAddLimit())));
         }
 
         @Override
         public void addToBuffer(long amount) {
-            long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit());
+            long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit(getAdded(), getRemainingAddLimit()));
             if (allowed <= 0L) {
                 return;
             }
@@ -284,7 +281,7 @@ public class TileInductionPortFlux extends TileEntityInductionPort implements IF
 
         @Override
         public long removeFromBuffer(long amount) {
-            long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit());
+            long allowed = Math.min(Math.max(0L, amount), getEffectiveFluxTransferLimit(getRemoved(), getRemainingRemoveLimit()));
             if (allowed <= 0L) {
                 return 0L;
             }

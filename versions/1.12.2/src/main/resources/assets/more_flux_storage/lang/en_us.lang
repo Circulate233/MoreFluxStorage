@@ -2,3 +2,5 @@ tile.more_flux_storage.energy_pylon_flux.name=Flux Energy Pylon
 tile.more_flux_storage.induction_port_flux.name=Flux Induction Port
 block.more_flux_storage.energy_pylon_flux.tooltip=Dragon's Aura, Heart of All Spirits
 block.more_flux_storage.induction_port_flux.tooltip=Primal Flux, Converged Might
+
+itemGroup.more_flux_storage=More Flux Storage
