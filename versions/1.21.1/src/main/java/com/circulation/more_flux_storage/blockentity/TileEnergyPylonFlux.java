@@ -208,7 +208,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
         @Override
         public long getRequest() {
             TileEnergyCore core = getCore();
-            if (core == null || !ioMode.get().canReceive()) {
+            if (core == null) {
                 return 0L;
             }
 
@@ -220,7 +220,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
         public void addToBuffer(long amount) {
             TileEnergyCore core = getCore();
             long allowed = Math.min(Math.max(0L, amount), getRemainingAddLimit());
-            if (core == null || !ioMode.get().canReceive() || allowed <= 0L) {
+            if (core == null || allowed <= 0L) {
                 return;
             }
 
@@ -236,7 +236,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
         public long removeFromBuffer(long amount) {
             TileEnergyCore core = getCore();
             long allowed = Math.min(Math.max(0L, amount), getRemainingRemoveLimit());
-            if (core == null || !ioMode.get().canExtract() || allowed <= 0L) {
+            if (core == null || allowed <= 0L) {
                 return 0L;
             }
 
