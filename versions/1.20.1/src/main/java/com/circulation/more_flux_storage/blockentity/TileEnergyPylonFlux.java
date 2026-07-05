@@ -28,6 +28,8 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
 
     private final EnergyPylonTransferHandler transferHandler = new EnergyPylonTransferHandler();
     private ProxyFluxDevice fluxProxyDevice;
+    private CompoundTag pendingFluxTag;
+    private byte pendingFluxTagType;
     private int fluxTick;
 
     public TileEnergyPylonFlux(BlockPos pos, BlockState state) {
@@ -53,6 +55,11 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void onLoad() {
         getOrCreateFluxProxyDevice().setLevel();
+        // Process any pending flux tag data that was received before level was initialized
+        if (pendingFluxTag != null) {
+            getOrCreateFluxProxyDevice().readCustomTag(pendingFluxTag, pendingFluxTagType);
+            pendingFluxTag = null;
+        }
         super.onLoad();
     }
 
@@ -79,6 +86,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void readExtraNBT(CompoundTag tag) {
         super.readExtraNBT(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_SAVE_ALL);
     }
 
@@ -99,6 +107,7 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void handleUpdateTag(@NotNull CompoundTag tag) {
         super.handleUpdateTag(tag);
+        getOrCreateFluxProxyDevice().setLevel();
         getOrCreateFluxProxyDevice().readCustomTag(tag, FluxConstants.NBT_TILE_UPDATE);
     }
 
@@ -138,7 +147,14 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
 
     @Override
     public void readFluxTag(CompoundTag tag, byte type) {
-        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+        ProxyFluxDevice device = getOrCreateFluxProxyDevice();
+        device.setLevel();
+        if (device.getLevel() == null) {
+            pendingFluxTag = tag.copy();
+            pendingFluxTagType = type;
+        } else {
+            device.readCustomTag(tag, type);
+        }
     }
 
     @NotNull

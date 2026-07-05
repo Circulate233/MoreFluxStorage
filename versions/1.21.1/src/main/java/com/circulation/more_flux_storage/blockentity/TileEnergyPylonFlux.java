@@ -28,6 +28,8 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
 
     private final EnergyPylonTransferHandler transferHandler = new EnergyPylonTransferHandler();
     private ProxyFluxDevice fluxProxyDevice;
+    private CompoundTag pendingFluxTag;
+    private byte pendingFluxTagType;
     private int fluxTick;
 
     public TileEnergyPylonFlux(BlockPos pos, BlockState state) {
@@ -53,6 +55,11 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
     @Override
     public void onLoad() {
         getOrCreateFluxProxyDevice().syncLevel();
+        // Process any pending flux tag data that was received before level was initialized
+        if (pendingFluxTag != null) {
+            getOrCreateFluxProxyDevice().readCustomTag(pendingFluxTag, pendingFluxTagType);
+            pendingFluxTag = null;
+        }
         super.onLoad();
     }
 
@@ -139,7 +146,16 @@ public class TileEnergyPylonFlux extends TileEnergyPylon implements IFluxProxyHo
 
     @Override
     public void readFluxTag(CompoundTag tag, byte type) {
-        getOrCreateFluxProxyDevice().readCustomTag(tag, type);
+        // FIX: Sync level on the proxy device before reading, as ProxyFluxDevice has its own
+        // level field that must be explicitly synced from the host BlockEntity
+        ProxyFluxDevice device = getOrCreateFluxProxyDevice();
+        device.syncLevel();
+        if (device.getLevel() == null) {
+            pendingFluxTag = tag.copy();
+            pendingFluxTagType = type;
+        } else {
+            device.readCustomTag(tag, type);
+        }
     }
 
     @Override
